@@ -258,6 +258,42 @@ class TicketBookingClient:
         ttk.Button(dialog, text="Xác nhận hủy", command=do_cancel).pack(pady=6)
         ttk.Button(dialog, text="Hủy", command=dialog.destroy).pack()
 
+    def view_all_bookings(self):
+        if not self.selected_trip:
+            messagebox.showwarning("Cảnh báo", "Chọn chuyến đã.")
+            return
+        resp = self.send_request({
+            'command': 'get_seats',
+            'trip_id': self.selected_trip,
+            'only_mine': True
+        })
+        if resp.get('status') == 'success':
+            dialog = tk.Toplevel(self.root)
+            dialog.title("Vé của tôi")
+            dialog.geometry("500x400")
+            text = tk.Text(dialog, wrap='word')
+            text.pack(fill='both', expand=True)
+            bookings = resp.get('booked_seats', {})
+            if not bookings:
+                text.insert('end', 'Bạn chưa đặt vé nào.\n')
+            else:
+                for seat, info in sorted(bookings.items(), key=lambda x: int(x[0])):
+                    user = info['user_info']
+                    ts = info['timestamp']
+                    tid = info['ticket_id']
+                    text.insert('end', f"Ghế {seat}: {user['name']} - {user['phone']} - {ts} - mã: {tid}\n\n")
+            text.config(state='disabled')
+        else:
+            messagebox.showerror("Lỗi", resp.get('message', ''))
+
+
+    def quit(self):
+        try:
+            self.sock.close()
+        except:
+            pass
+        self.root.quit()
+
 if __name__ == "__main__":
     root = tk.Tk()
     style = ttk.Style(root)
