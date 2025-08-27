@@ -61,7 +61,7 @@ async def handle_client(sock, addr):
             cmd = req.get("command")
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             #xu ly dieu kien
-            if cmd == "get_client_id":
+            if cmd == "get_client_id": #xu li dieu kien lan 1 
                 await send_json(writer, {"status": "success", "client_id": client_id})
 
             elif cmd == "view_trips":
@@ -84,7 +84,7 @@ async def handle_client(sock, addr):
                 else:
                     await send_json(writer, {"status": "error", "message": "Chuyến không tồn tại"})    
 
-            elif cmd == "book_seat":
+            elif cmd == "book_seat": #xu li dieu kien lan 2
                 trip_id = req.get("trip_id")
                 seat_num = req.get("seat_num")
                 user_info = req.get("user_info", {})
@@ -116,7 +116,40 @@ async def handle_client(sock, addr):
                     }
                     await send_json(writer, {"status": "success", "message": f"Đặt vé thành công! Mã vé: {tid}"})
                     print(f"[{timestamp}] Client {client_id} ({addr}) đặt ghế {seat_num} trên chuyến {trip_id} thành công, mã vé: {tid}")
-            
+
+            elif cmd == "get_booking_info": # xu li dieu kien lan 3 
+                trip_id = req.get("trip_id")
+                seat_num = req.get("seat_num")
+                if trip_id in trips and str(seat_num) in trips[trip_id]['booked_seats']:
+                    await send_json(writer, {"status": "success", "info": trips[trip_id]['booked_seats'][str(seat_num)]})
+                else:
+                    await send_json(writer, {"status": "error", "message": "Không tìm thấy thông tin vé"})
+
+            elif cmd == "cancel_booking":
+                trip_id = req.get("trip_id")
+                seat_num = req.get("seat_num")
+                ticket_id = req.get("ticket_id")
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print(f"[{timestamp}] Client {client_id} ({addr}) hủy ghế {seat_num} trên chuyến {trip_id}, mã vé: {ticket_id}")
+                if trip_id in trips and str(seat_num) in trips[trip_id]['booked_seats']:
+                    booking = trips[trip_id]['booked_seats'][str(seat_num)]
+                    if booking['ticket_id'] != ticket_id:
+                        await send_json(writer, {"status": "error", "message": "Mã vé sai"})
+                        print(f"[{timestamp}] Client {client_id} ({addr}) lỗi: Mã vé sai cho ghế {seat_num} trên chuyến {trip_id}")
+                    elif booking['owner_id'] != client_id:
+                        await send_json(writer, {"status": "error", "message": "Bạn không thể hủy vé của người khác"})
+                        print(f"[{timestamp}] Client {client_id} ({addr}) lỗi: Không thể hủy vé của người khác cho ghế {seat_num} trên chuyến {trip_id}")
+                    else:
+                        del trips[trip_id]['booked_seats'][str(seat_num)]
+                        await send_json(writer, {"status": "success", "message": "Hủy vé thành công"})
+                        print(f"[{timestamp}] Client {client_id} ({addr}) hủy ghế {seat_num} trên chuyến {trip_id} thành công")
+                else:
+                    await send_json(writer, {"status": "error", "message": "Không tìm thấy vé"})
+                    print(f"[{timestamp}] Client {client_id} ({addr}) lỗi: Không tìm thấy vé cho ghế {seat_num} trên chuyến {trip_id}")
+
+            else:
+                await send_json(writer, {"status": "error", "message": "Lệnh không hợp lệ"})
+                print(f"[{timestamp}] Client {client_id} ({addr}) lỗi: Lệnh không hợp lệ - {cmd}")
 
     except Exception as e:
         print(f"[!] Lỗi với client {addr}: {e}")
