@@ -1,10 +1,8 @@
 import asyncio
 import json
-from lib2to3.pgen2.token import ASYNC
 import re
 from datetime import datetime
 import uuid
-import socket 
 # =====================
 # Dữ liệu chuyến chung
 # =====================
