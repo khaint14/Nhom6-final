@@ -156,3 +156,21 @@ async def handle_client(sock, addr):
     finally:
         sock.close()
         print(f"[-] Client {addr} ngắt kết nối")
+
+def start_server(host='localhost', port=5555):
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind((host, port))
+    server.listen(5)
+    print(f"Server chạy tại {host}:{port}")
+    try:
+        while True:
+            client_sock, addr = server.accept()
+            threading.Thread(target=handle_client, args=(client_sock, addr), daemon=True).start()
+    except KeyboardInterrupt:
+        print("Tắt server.")
+    finally:
+        server.close()
+
+if __name__ == "__main__":
+    start_server()
