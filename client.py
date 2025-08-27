@@ -125,6 +125,59 @@ class TicketBookingClient:
         else:
             messagebox.showerror("Lỗi", resp.get('message','Không xác định'))
 
+    def on_trip_select(self, event):
+        sel = self.trip_tree.selection()
+        if not sel:
+            return
+        self.selected_trip = self.trip_tree.item(sel[0])['values'][0]
+        self.seat_label.config(text=f"Sơ đồ ghế cho chuyến: {self.selected_trip}")
+        self.display_seats()
+
+    def display_seats(self):
+        if not self.selected_trip:
+            messagebox.showwarning("Cảnh báo", "Chọn chuyến trước nhé.")
+            return
+        resp = self.send_request({'command':'get_seats','trip_id':self.selected_trip})
+        if resp.get('status') == 'success':
+            booked_info = resp.get('booked_seats', {})
+            booked = {num:info for num,info in booked_info.items()}
+            self.draw_seat_map(booked)
+        else:
+            messagebox.showerror("Lỗi", resp.get('message','Không xác định'))
+
+
+
+    def try_cancel(self, seat_num, booking_info):
+        if booking_info.get("owner_id") != self.client_id:
+            messagebox.showwarning("Không thể hủy", "Bạn không thể hủy vé của người khác.")
+            return
+        self.open_cancel_dialog(seat_num)
+
+    def show_booking_info(self, info):
+        txt = f"Tên: {info['user_info']['name']}\nSĐT: {info['user_info']['phone']}\nThời gian: {info['timestamp']}\nMã vé: {info['ticket_id']}\n"
+        self.info_area.config(state='normal'); self.info_area.delete('1.0','end'); self.info_area.insert('end', txt); self.info_area.config(state='disabled')
+
+    def clear_info_area(self):
+        self.info_area.config(state='normal'); self.info_area.delete('1.0','end'); self.info_area.config(state='disabled')
+
+    def open_cancel_dialog(self, seat_num):
+        dialog = tk.Toplevel(self.root); dialog.title("Hủy vé"); dialog.geometry("420x260")
+        ttk.Label(dialog, text=f"Chuyến: {self.selected_trip}").pack(pady=6)
+        ttk.Label(dialog, text=f"Ghế: {seat_num}").pack()
+        ttk.Label(dialog, text="Nhập mã vé:").pack(pady=6)
+        entry = ttk.Entry(dialog, width=30); entry.pack()
+        def do_cancel():
+            code = entry.get().strip()
+            if not code:
+                messagebox.showwarning("Lỗi", "Nhập mã vé để xác nhận.", parent=dialog); return
+            resp2 = self.send_request({'command':'cancel_booking','trip_id':self.selected_trip,'seat_num':seat_num,'ticket_id':code})
+            if resp2.get('status')=='success':
+                messagebox.showinfo("Thành công", resp2.get('message'), parent=dialog)
+                dialog.destroy(); self.display_seats(); self.view_trips()
+            else:
+                messagebox.showerror("Lỗi", resp2.get('message'), parent=dialog)
+        ttk.Button(dialog, text="Xác nhận hủy", command=do_cancel).pack(pady=6)
+        ttk.Button(dialog, text="Hủy", command=dialog.destroy).pack()
 
 if __name__ == "__main__":
     root = tk.Tk()
