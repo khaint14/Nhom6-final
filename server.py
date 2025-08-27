@@ -21,3 +21,24 @@ async def send_json(writer, obj):
     data = json.dumps(obj) + "\n"
     writer.write(data.encode("utf-8"))
     await writer.drain()
+    
+async def recv_json(reader, buffer):
+    while "\n" not in buffer:
+        chunk = await reader.read(4096)
+        if not chunk:
+            return None, buffer
+        buffer += chunk.decode("utf-8")
+    line, rest = buffer.split("\n", 1)
+    return json.loads(line), rest
+
+# =====================
+# Validate
+# =====================
+def is_valid_phone(phone):
+    return bool(re.match(r'^\d{10}$', phone))
+
+def is_valid_name(name):
+    return bool(re.match(r'^[A-Za-z\s]{2,}$', name))
+
+def generate_ticket_id():
+    return str(uuid.uuid4())[:8]
