@@ -190,7 +190,42 @@ class TicketBookingClient:
                                      lambda e, n=num: self.show_booking_info(booked[str(n)]))
                     self.canvas.tag_bind(rect, '<Leave>', lambda e: self.clear_info_area())
 
+    def open_booking_dialog(self, seat_num):
+        dialog = tk.Toplevel(self.root)
+        dialog.title("Đặt vé")
+        dialog.geometry("420x260")
+        ttk.Label(dialog, text=f"Chuyến: {self.selected_trip}", font=('Helvetica',12,'bold')).pack(pady=8)
+        ttk.Label(dialog, text=f"Ghế: {seat_num}").pack()
+        frm = ttk.Frame(dialog, padding=10)
+        frm.pack(fill='both', expand=True)
+        ttk.Label(frm, text="Tên:").grid(row=0,column=0,sticky='w')
+        name_entry = ttk.Entry(frm, width=30); name_entry.grid(row=0,column=1,padx=6,pady=6)
+        ttk.Label(frm, text="SĐT (10 số):").grid(row=1,column=0,sticky='w')
+        phone_entry = ttk.Entry(frm, width=30); phone_entry.grid(row=1,column=1,padx=6,pady=6)
 
+        def confirm():
+            name = name_entry.get().strip()
+            phone = phone_entry.get().strip()
+            if not re.match(r'^[A-Za-z\s]{2,}$', name):
+                messagebox.showwarning("Lỗi", "Tên không hợp lệ.", parent=dialog); return
+            if not re.match(r'^\d{10}$', phone):
+                messagebox.showwarning("Lỗi", "SĐT phải 10 chữ số.", parent=dialog); return
+            resp = self.send_request({'command':'book_seat','trip_id':self.selected_trip,'seat_num':seat_num,'user_info':{'name':name,'phone':phone}})
+            if resp.get('status')=='success':
+                msg = resp.get('message','')
+                ticket = msg.split('Mã vé:')[-1].strip() if 'Mã vé:' in msg else ''
+                messagebox.showinfo("Thành công", msg, parent=dialog)
+                if ticket:
+                    pyperclip.copy(ticket)
+                dialog.destroy()
+                self.display_seats()
+                self.view_trips()
+            else:
+                messagebox.showerror("Lỗi", resp.get('message','Không xác định'), parent=dialog)
+
+        ttk.Button(dialog, text="Đặt vé", command=confirm).pack(pady=6)
+        ttk.Button(dialog, text="Hủy", command=dialog.destroy).pack()
+        
     def try_cancel(self, seat_num, booking_info):
         if booking_info.get("owner_id") != self.client_id:
             messagebox.showwarning("Không thể hủy", "Bạn không thể hủy vé của người khác.")
