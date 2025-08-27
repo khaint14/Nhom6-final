@@ -42,3 +42,27 @@ def is_valid_name(name):
 
 def generate_ticket_id():
     return str(uuid.uuid4())[:8]
+
+def handle_client(sock, addr):
+    buffer = ""
+    client_id = str(uuid.uuid4())  # ID duy nhất cho client
+    print(f"[+] Client {addr} kết nối với ID {client_id}")
+
+    try:
+        while True:
+            req, buffer = recv_json(sock, buffer)
+            if req is None:
+                if buffer == "":
+                    break
+                else:
+                    continue
+
+            cmd = req.get("command")
+        #xu ly dieu kien
+            
+
+    except Exception as e:
+        print(f"[!] Lỗi với client {addr}: {e}")
+    finally:
+        sock.close()
+        print(f"[-] Client {addr} ngắt kết nối")
