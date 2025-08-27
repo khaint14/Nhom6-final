@@ -1,5 +1,6 @@
 import asyncio
 import json
+from lib2to3.pgen2.token import ASYNC
 import re
 from datetime import datetime
 import uuid
@@ -43,7 +44,7 @@ def is_valid_name(name):
 def generate_ticket_id():
     return str(uuid.uuid4())[:8]
 
-def handle_client(sock, addr):
+async def handle_client(sock, addr):
     buffer = ""
     client_id = str(uuid.uuid4())  # ID duy nhất cho client
     print(f"[+] Client {addr} kết nối với ID {client_id}")
@@ -58,7 +59,30 @@ def handle_client(sock, addr):
                     continue
 
             cmd = req.get("command")
-        #xu ly dieu kien
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            #xu ly dieu kien
+            if cmd == "get_client_id":
+                await send_json(writer, {"status": "success", "client_id": client_id})
+
+            elif cmd == "view_trips":
+                available = {
+                    t: info['total_seats'] - len(info['booked_seats'])
+                    for t, info in trips.items()
+                }
+                await send_json(writer, {"status": "success", "trips": available})
+
+            elif cmd == "get_seats":
+                trip_id = req.get("trip_id")
+                only_mine = req.get("only_mine", False)
+                if trip_id in trips:
+                    if only_mine:
+                        booked = {int(s): info for s, info in trips[trip_id]['booked_seats'].items()
+                                  if info['owner_id'] == client_id}
+                    else:
+                        booked = {int(s): info for s, info in trips[trip_id]['booked_seats'].items()}
+                    await send_json(writer, {"status": "success", "booked_seats": booked})
+                else:
+                    await send_json(writer, {"status": "error", "message": "Chuyến không tồn tại"})    
             
 
     except Exception as e:
