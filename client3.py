@@ -25,7 +25,7 @@ def recv_json(sock, buffer):
 class TicketBookingClient:
     def __init__(self, root):
         self.root = root
-        self.root.title("H? th?ng �?t V� Xe (Client2)")
+        self.root.title("Hệ thống đặt Vé Xe (Client3)")
         self.root.geometry("900x650")
         self.root.configure(bg="#f6f8fa")
         self.buffer = ''
