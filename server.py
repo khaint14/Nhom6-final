@@ -3,6 +3,7 @@ import json
 import re
 from datetime import datetime
 import uuid
+
 # =====================
 # Dữ liệu chuyến chung
 # =====================
@@ -20,7 +21,7 @@ async def send_json(writer, obj):
     data = json.dumps(obj) + "\n"
     writer.write(data.encode("utf-8"))
     await writer.drain()
-    
+
 async def recv_json(reader, buffer):
     while "\n" not in buffer:
         chunk = await reader.read(4096)
@@ -42,14 +43,16 @@ def is_valid_name(name):
 def generate_ticket_id():
     return str(uuid.uuid4())[:8]
 
-async def handle_client(sock, addr):
+async def handle_client(reader, writer):
+    addr = writer.get_extra_info('peername')
     buffer = ""
     client_id = str(uuid.uuid4())  # ID duy nhất cho client
-    print(f"[+] Client {addr} kết nối với ID {client_id}")
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] [+] Client {client_id} ({addr}) kết nối")
 
     try:
         while True:
-            req, buffer = recv_json(sock, buffer)
+            req, buffer = await recv_json(reader, buffer)
             if req is None:
                 if buffer == "":
                     break
@@ -58,8 +61,8 @@ async def handle_client(sock, addr):
 
             cmd = req.get("command")
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            #xu ly dieu kien
-            if cmd == "get_client_id": #xu li dieu kien lan 1 
+
+            if cmd == "get_client_id":
                 await send_json(writer, {"status": "success", "client_id": client_id})
 
             elif cmd == "view_trips":
@@ -80,9 +83,9 @@ async def handle_client(sock, addr):
                         booked = {int(s): info for s, info in trips[trip_id]['booked_seats'].items()}
                     await send_json(writer, {"status": "success", "booked_seats": booked})
                 else:
-                    await send_json(writer, {"status": "error", "message": "Chuyến không tồn tại"})    
+                    await send_json(writer, {"status": "error", "message": "Chuyến không tồn tại"})
 
-            elif cmd == "book_seat": #xu li dieu kien lan 2
+            elif cmd == "book_seat":
                 trip_id = req.get("trip_id")
                 seat_num = req.get("seat_num")
                 user_info = req.get("user_info", {})
@@ -115,7 +118,7 @@ async def handle_client(sock, addr):
                     await send_json(writer, {"status": "success", "message": f"Đặt vé thành công! Mã vé: {tid}"})
                     print(f"[{timestamp}] Client {client_id} ({addr}) đặt ghế {seat_num} trên chuyến {trip_id} thành công, mã vé: {tid}")
 
-            elif cmd == "get_booking_info": # xu li dieu kien lan 3 
+            elif cmd == "get_booking_info":
                 trip_id = req.get("trip_id")
                 seat_num = req.get("seat_num")
                 if trip_id in trips and str(seat_num) in trips[trip_id]['booked_seats']:
@@ -150,25 +153,22 @@ async def handle_client(sock, addr):
                 print(f"[{timestamp}] Client {client_id} ({addr}) lỗi: Lệnh không hợp lệ - {cmd}")
 
     except Exception as e:
-        print(f"[!] Lỗi với client {addr}: {e}")
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp}] [!] Lỗi với client {client_id} ({addr}): {e}")
     finally:
-        sock.close()
-        print(f"[-] Client {addr} ngắt kết nối")
+        writer.close()
+        await writer.wait_closed()
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"[{timestamp}] [-] Client {client_id} ({addr}) ngắt kết nối")
 
-def start_server(host='localhost', port=5555):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    server.bind((host, port))
-    server.listen(5)
-    print(f"Server chạy tại {host}:{port}")
-    try:
-        while True:
-            client_sock, addr = server.accept()
-            threading.Thread(target=handle_client, args=(client_sock, addr), daemon=True).start()
-    except KeyboardInterrupt:
-        print("Tắt server.")
-    finally:
-        server.close()
+async def start_server(host='localhost', port=5555):
+    server = await asyncio.start_server(handle_client, host, port)
+    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Server chạy tại {host}:{port}")
+    async with server:
+        await server.serve_forever()
 
 if __name__ == "__main__":
-    start_server()
+    try:
+        asyncio.run(start_server())
+    except KeyboardInterrupt:
+        print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Tắt server.")
