@@ -144,7 +144,51 @@ class TicketBookingClient:
             self.draw_seat_map(booked)
         else:
             messagebox.showerror("Lỗi", resp.get('message','Không xác định'))
+    
+    def draw_seat_map(self, booked):
+        self.canvas.delete('all')
+        self.seat_rects.clear()
+        seat_size = 60
+        padding = 14
+        rows = 5
+        cols = 4
+        for r in range(rows):
+            for c in range(cols):
+                num = r*cols + c + 1
+                x1 = c*(seat_size+padding)+padding
+                y1 = r*(seat_size+padding)+padding
+                x2 = x1 + seat_size
+                y2 = y1 + seat_size
 
+                if str(num) in booked:
+                # Kiểm tra chủ sở hữu ghế
+                    if booked[str(num)]['owner_id'] == self.client_id:
+                        color = 'yellow'   # Ghế của mình
+                    else:
+                        color = 'red'      # Ghế của người khác
+                else:
+                    color = 'green'        # Ghế trống
+
+                rect = self.canvas.create_rectangle(x1, y1, x2, y2,
+                                                fill=color, outline='black',
+                                                tags=('seat', str(num)))
+                self.canvas.create_text((x1+x2)/2, (y1+y2)/2,
+                                    text=str(num), font=('Helvetica',14,'bold'))
+                self.seat_rects[num] = rect
+
+                if color == 'green':
+                    self.canvas.tag_bind(rect, '<Button-1>',
+                                     lambda e, n=num: self.open_booking_dialog(n))
+                elif color == 'yellow':
+                    self.canvas.tag_bind(rect, '<Button-1>',
+                                     lambda e, n=num: self.try_cancel(n, booked[str(n)]))
+                    self.canvas.tag_bind(rect, '<Enter>',
+                                     lambda e, n=num: self.show_booking_info(booked[str(n)]))
+                    self.canvas.tag_bind(rect, '<Leave>', lambda e: self.clear_info_area())
+                elif color == 'red':
+                    self.canvas.tag_bind(rect, '<Enter>',
+                                     lambda e, n=num: self.show_booking_info(booked[str(n)]))
+                    self.canvas.tag_bind(rect, '<Leave>', lambda e: self.clear_info_area())
 
 
     def try_cancel(self, seat_num, booking_info):
