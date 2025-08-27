@@ -1,0 +1,138 @@
+commit 44ccafbcb706423b4a2c7967c932573dc455ffd8
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 22:49:22 2025 +0700
+
+    doi ten client
+
+commit f207c246527a42eecd3e10a3c93508f7071e0171
+Author: NguyenDangKimNgan <nganndk0185@ut.edu.vn>
+Date:   Wed Aug 27 14:22:32 2025 +0700
+
+    them 2 client chay multi
+
+commit 107112b1b60ec6a028c02578528df1b70f2e4341
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 14:12:16 2025 +0700
+
+    server.py final
+
+commit f779380ae9ed98a14bc10039de3f14b69816ab84
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 14:09:18 2025 +0700
+
+    xoa thu vien
+
+commit 9290d58f79bc6936931cf186c2849ca97425ab8e
+Author: NguyenDangKimNgan <nganndk0185@ut.edu.vn>
+Date:   Wed Aug 27 14:04:49 2025 +0700
+
+    them thu vien socket
+
+commit f51282c8dd21684ae3e13bd0751e7d8944037355
+Author: NguyenDangKimNgan <nganndk0185@ut.edu.vn>
+Date:   Wed Aug 27 14:01:12 2025 +0700
+
+    xoa vs.
+
+commit 8512ab5219b767176d146016455012d64ff4fbc3
+Author: NguyenDangKimNgan <nganndk0185@ut.edu.vn>
+Date:   Wed Aug 27 14:00:01 2025 +0700
+
+    view all booking
+
+commit 4d551d588f47e8739d15e9970b7e654da48444b5
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 13:58:00 2025 +0700
+
+    open_booking_dialog
+
+commit a455aabdbe11a906df919a528de39e612d436b17
+Author: Nguyễn Hoàng Nam Anh <anhnhn3140@ut.edu.vn>
+Date:   Wed Aug 27 13:55:35 2025 +0700
+
+    draw_seat_map
+
+commit bb812c52c1c2069753f1282a4ab0e45ad41594f9
+Author: PhamDucDatCN2301CLCB <hhakio1234@gmail.com>
+Date:   Wed Aug 27 13:51:39 2025 +0700
+
+    huy, dat ve
+
+commit 399f2a06d06f14275805dce1dddd2dbe60fae241
+Author: NguyenDangKimNgan <nganndk0185@ut.edu.vn>
+Date:   Wed Aug 27 13:46:56 2025 +0700
+
+    tao giao dien
+
+commit d3b99ce00abdab77e8b269ee1e2ceaa3ed6b27f5
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 13:43:38 2025 +0700
+
+    ket noi server - get id
+
+commit f2bfd5b0db77afbc0c2a4e2e43be9f8b5e13b689
+Author: Nguyễn Hoàng Nam Anh <anhnhn3140@ut.edu.vn>
+Date:   Wed Aug 27 13:41:38 2025 +0700
+
+    Them_thu_vien Lop Client
+
+commit 560b828b1869a106897d37a8cc613485cdc354c4
+Author: PhamDucDatCN2301CLCB <hhakio1234@gmail.com>
+Date:   Wed Aug 27 13:33:23 2025 +0700
+
+    server final
+
+commit 2875fb2016932d263902e33409fd54208c9bddaf
+Author: NguyenDangKimNgan <nganndk0185@ut.edu.vn>
+Date:   Wed Aug 27 13:30:21 2025 +0700
+
+    xu li dieu kien lan 3
+
+commit f913a70d4c6317a7d4f070c796f32ea1554fd027
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 13:22:50 2025 +0700
+
+    xu li dieu kien lan 2
+
+commit 60c3143ebd996f4f2cfb61cdb54772f17e59a013
+Author: Nguyễn Hoàng Nam Anh <anhnhn3140@ut.edu.vn>
+Date:   Wed Aug 27 13:17:34 2025 +0700
+
+    xu_li_dieu_kien_lan_1
+
+commit 6e1355a9577f2df54ad5cd386d53e7ee3a5f4366
+Author: PhamDucDatCN2301CLCB <hhakio1234@gmail.com>
+Date:   Wed Aug 27 13:06:16 2025 +0700
+
+    viet ham handle_client xu ly ngoai le
+
+commit d38b3005dad025537e9b933554bfafe275b2bb31
+Author: NguyenDangKimNgan <nganndk0185@ut.edu.vn>
+Date:   Wed Aug 27 12:58:39 2025 +0700
+
+    kiem tra dieu kien
+
+commit 5d416cf8125f6627afdea4e3bf29be1ffa141b9d
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 12:48:38 2025 +0700
+
+    them thu vien - data - json
+
+commit 1643e93aa49971e85bd3fbc724b536338fbdf6b9
+Author: PhamDucDatCN2301CLCB <hhakio1234@gmail.com>
+Date:   Wed Aug 27 12:37:51 2025 +0700
+
+    prin
+    []
+
+commit b52ee14318d9ccf906bd12d8b20b87e2e905f0c8
+Author: PhamDucDatCN2301CLCB <hhakio1234@gmail.com>
+Date:   Wed Aug 27 10:05:32 2025 +0700
+
+    test
+
+commit 709c0a77ade5d51a3ef34efb4d83bbc2a0119c25
+Author: khaint14 <khaint6847@ut.edu.vn>
+Date:   Wed Aug 27 00:24:36 2025 +0700
+
+    tai file
